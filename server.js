@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
 
+const axios = require('axios');
+
 // env
 dotenv.config({ path: './config/.config.env' });
 
@@ -13,8 +15,13 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-app.get('/', (req, res) => {
-  res.send('testing');
+app.get('/', async (req, res) => {
+  const { data } = await axios.get(
+    `https://api.edamam.com/search?q=${req.params.query}&app_id=${process.env.EDAMAM_APP_ID}&app_key=${process.env.EDAMA_APP_KEY}`
+  );
+  const recipes = data.hits;
+
+  res.json({ recipes });
 });
 
 const PORT = process.env.PORT || 5000;
